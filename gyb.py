@@ -1983,11 +1983,15 @@ def convert_datetime(val):
     return datetime.datetime.fromisoformat(val.decode())
 
 def convert_timestamp(val):
-    """Convert Unix epoch timestamp to datetime.datetime object."""
-    # yuck, we aren't actually storing timestamps in the GYB
-    # database. I blame the original developer :-)
-    # return datetime.datetime.fromtimestamp(int(val))
-    return datetime.datetime.strptime(val.decode('UTF-8'), '%Y-%m-%d %H:%M:%S')
+    val = val.decode('UTF-8')  # Assuming `val` is a bytes object that needs decoding.
+    # Check if the datetime string contains fractional seconds.
+    if '.' in val:
+        # If yes, parse with fractional seconds.
+        format_str = '%Y-%m-%d %H:%M:%S.%f'
+    else:
+        # If no, parse without fractional seconds.
+        format_str = '%Y-%m-%d %H:%M:%S'
+    return datetime.datetime.strptime(val, format_str)
 
 def main(argv):
   global options, gmail
